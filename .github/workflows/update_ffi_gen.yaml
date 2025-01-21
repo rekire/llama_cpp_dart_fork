@@ -1,0 +1,33 @@
+name: FFI Playground
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "10.0"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.2
+
+      - name: Clone llama.cpp repo
+        run: git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
+
+      - name: run ffigen
+        run: dart run ffigen
+
+      - name: log generated file for testing
+        run: cat lib/src/llama_cpp.dart
