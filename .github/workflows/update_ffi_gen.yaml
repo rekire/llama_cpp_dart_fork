@@ -36,6 +36,7 @@ jobs:
           wc -l llama.cpp/include/llama.h | cut -d \  -f 1
 
       - name: run ffigen
+        working-directory: 'llama.cpp/include'
         run: dart run ffigen
 
       - name: Check testing
