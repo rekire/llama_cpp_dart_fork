@@ -35,13 +35,13 @@ jobs:
           git checkout $RELEASE
           echo -e "preamble: |\n  // Based on $RELEASE" >> ../.github/ffigen.yaml
           cat ../.github/ffigen.yaml
-          echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: run ffigen
         id: ffigen
         working-directory: 'llama.cpp/include'
         env:
-          VERSION: ${{ steps.llama.version }}
+          VERSION: ${{ steps.llama.VERSION }}
         run: |
           dart run ffigen --config ../../.github/ffigen.yaml
           cd ../..
@@ -49,16 +49,16 @@ jobs:
             echo 'No changes detected. See yourself:'
             git remote -v
             git status
-            echo 'diff=FALSE' >> "$GITHUB_OUTPUT"
+            echo 'DIFF=FALSE' >> "$GITHUB_OUTPUT"
           else
             echo "Detected changes in $VERSION..."
-            echo 'diff=TRUE' >> "$GITHUB_OUTPUT"
+            echo 'DIFF=TRUE' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Rollout changes
-        if: ${{ steps.ffigen.diff == 'TRUE' }}
+        if: ${{ steps.ffigen.DIFF == 'TRUE' }}
         env:
-          version: ${{ steps.llama.version }}
+          VERSION: ${{ steps.llama.VERSION }}
         run: |
-          echo "TODO: Automate release of $version"
+          echo "TODO: Automate release of $VERSION"
           git diff
