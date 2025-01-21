@@ -1,0 +1,9 @@
+name: 'llama_cpp'
+description: 'llama.cpp binding'
+output: '../../lib/src/llama_cpp.dart'
+# ignore-source-errors: true
+headers:
+  entry-points:
+    - 'llama.h'
+compiler-opts:
+  - '-I/usr/lib/clang/17/include'
