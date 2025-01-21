@@ -29,11 +29,11 @@ jobs:
       - name: Clone llama.cpp repository
         run: git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
 
-      - name: check llama.cpp/src/llama.h
+      - name: check llama.cpp/include/llama.h
         run: |
-          ls -la llama.cpp/src/llama.h
-          echo -n 'Line count of llama.cpp/src/llama.h: '
-          wc -l llama.cpp/src/llama.h | cut -d \  -n 1
+          ls -la llama.cpp/include/llama.h
+          echo -n 'Line count of llama.cpp/include/llama.h: '
+          wc -l llama.cpp/include/llama.h | cut -d \  -n 1
 
       - name: run ffigen
         run: dart run ffigen
