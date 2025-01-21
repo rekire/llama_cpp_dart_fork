@@ -33,7 +33,7 @@ jobs:
           cd llama.cpp
           RELEASE=`git describe --tags --abbrev=0`
           git checkout $RELEASE
-          echo "preamble: // Based on $RELEASE" >> ../.github/ffigen.yaml
+          echo "preamble:\n// Based on $RELEASE" >> ../.github/ffigen.yaml
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: run ffigen
