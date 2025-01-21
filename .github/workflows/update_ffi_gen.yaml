@@ -41,6 +41,7 @@ jobs:
         working-directory: 'llama.cpp/include'
         run: |
           dart run ffigen --config ../../.github/ffigen.yaml
+          cd ../..
           if [[ -z "$(git status --porcelain)" ]]; then
             echo "diff=FALSE" >> "$GITHUB_OUTPUT"
           else
