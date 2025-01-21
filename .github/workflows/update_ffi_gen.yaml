@@ -23,8 +23,17 @@ jobs:
           channel: stable
           flutter-version: 3.27.2
 
-      - name: Clone llama.cpp repo
+      - name: Before ls
+        run: ls -l
+
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Clone llama.cpp repository
         run: git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
+
+      - name: After ls
+        run: ls -l
 
       - name: run ffigen
         run: dart run ffigen
