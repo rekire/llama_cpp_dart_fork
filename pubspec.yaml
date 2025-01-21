@@ -29,7 +29,7 @@ ffigen: # dart run ffigen
   name: 'llama_cpp'
   description: 'llama.cpp binding'
   output: 'lib/src/llama_cpp.dart'
-  workdir: 'llama.cpp/include'
+  working-directory: 'llama.cpp/include'
   # ignore-source-errors: true
   headers:
     entry-points:
