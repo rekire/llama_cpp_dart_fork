@@ -44,13 +44,11 @@ jobs:
         run: |
           dart run ffigen --config ../../.github/ffigen.yaml
           cd ../..
+          git reset --hard .github/ffigen.yaml
           if [[ -z "$(git status --porcelain)" ]]; then
-            echo 'No changes detected. See yourself:'
-            git remote -v
-            git status
+            echo 'No changes detected.'
             echo 'diff=FALSE' >> "$GITHUB_OUTPUT"
           else
-            echo "Detected changes in $version..."
             echo 'diff=TRUE' >> "$GITHUB_OUTPUT"
           fi
 
