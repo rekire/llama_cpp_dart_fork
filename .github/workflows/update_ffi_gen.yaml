@@ -37,7 +37,7 @@ jobs:
 
       - name: run ffigen
         working-directory: 'llama.cpp/include'
-        run: dart run ffigen
+        run: dart run ffigen --config ../../pubspec.yaml
 
       - name: Check testing
         run: |
