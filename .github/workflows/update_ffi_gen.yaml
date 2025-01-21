@@ -34,6 +34,7 @@ jobs:
           RELEASE=`git describe --tags --abbrev=0`
           git checkout $RELEASE
           echo "preamble: |\n  // Based on $RELEASE" >> ../.github/ffigen.yaml
+          cat ../.github/ffigen.yaml
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: run ffigen
