@@ -26,11 +26,11 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Clone latest llama.cpp tag
+      - name: Checkout latest llama.cpp release
         id: llama
         run: |
           git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
-          cd llaama.cpp
+          cd llama.cpp
           RELEASE=`git describe --tags --abbrev=0`
           git checkout $RELEASE
           echo Checked out $RELEASE
