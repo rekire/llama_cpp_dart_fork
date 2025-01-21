@@ -35,6 +35,7 @@ ffigen: # dart run ffigen
       - 'llama.cpp/include/llama.h'
   compiler-opts:
     - '-I/usr/lib/clang/17/include'
+    - '-Illama.cpp/include'
 
 flutter:
   plugin:
