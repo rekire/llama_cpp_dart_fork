@@ -39,16 +39,19 @@ jobs:
       - name: run ffigen
         id: ffigen
         working-directory: 'llama.cpp/include'
+        env:
+          VERSION: ${{ steps.llama.version }}
         run: |
           dart run ffigen --config ../../.github/ffigen.yaml
           cd ../..
           if [[ -z "$(git status --porcelain)" ]]; then
-            echo "diff=FALSE" >> "$GITHUB_OUTPUT"
+            echo 'diff=FALSE' >> "$GITHUB_OUTPUT"
           else
-            echo "diff=TRUE"
+            echo "Detected changes in $VERSION..."
+            echo 'diff=TRUE' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check testing
+      - name: Rollout changes
         if: ${{ steps.ffigen.diff == 'TRUE' }}
         env:
           version: ${{ steps.llama.version }}
