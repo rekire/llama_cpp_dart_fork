@@ -26,22 +26,31 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Clone llama.cpp repository
-        run: git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
-
-      - name: check llama.cpp/include/llama.h
+      - name: Clone latest llama.cpp tag
+        id: llama
         run: |
-          ls -la llama.cpp/include/llama.h
-          echo -n 'Line count of llama.cpp/include/llama.h: '
-          wc -l llama.cpp/include/llama.h | cut -d \  -f 1
+          git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
+          cd llaama.cpp
+          RELEASE=`git describe --tags --abbrev=0`
+          git checkout $RELEASE
+          echo Checked out $RELEASE
+          echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: run ffigen
+        id: ffigen
         working-directory: 'llama.cpp/include'
-        run: dart run ffigen --config ../../.github/ffigen.yaml
+        run: |
+          dart run ffigen --config ../../.github/ffigen.yaml
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "diff=FALSE" >> "$GITHUB_OUTPUT"
+          else
+            echo "diff=TRUE"
+          fi
 
       - name: Check testing
+        if: ${{ steps.ffigen.diff == 'TRUE' }}
+        env:
+          version: ${{ steps.llama.version }}
         run: |
-          ls -la lib/src/llama_cpp.dart
-          echo -n 'Line count of llama_cpp.dart: '
-          wc -l lib/src/llama_cpp.dart | cut -d \  -f 1
-          cat lib/src/llama_cpp.dart
+          echo "TODO: Automate release of $version"
+          git diff

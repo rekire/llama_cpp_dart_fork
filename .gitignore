@@ -32,3 +32,6 @@ doc/api/
 
 **.DS_Store
 **.idea
+
+# playground
+llama.cpp/
