@@ -26,12 +26,6 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: check llama.cpp/src/llama.h (before clone)
-        run: |
-          ls -la llama.cpp/src/llama.h
-          echo -n 'Line count of llama.cpp/src/llama.h: '
-          wc -l llama.cpp/src/llama.h | cut -d \  -n 1
-
       - name: Clone llama.cpp repository
         run: git clone --depth 1 https://github.com/ggerganov/llama.cpp.git
 
