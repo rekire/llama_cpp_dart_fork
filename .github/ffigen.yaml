@@ -1,6 +1,6 @@
 name: 'llama_cpp'
 description: 'llama.cpp binding'
-output: '../../lib/src/llama_cpp.dart'
+output: '../../../lib/src/llama_cpp.dart'
 # ignore-source-errors: true
 headers:
   entry-points:
