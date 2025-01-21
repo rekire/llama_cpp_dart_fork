@@ -1,3 +1,8 @@
+# Playground notice
+This is my personal playground. No guaranties that I will maintain this fork.
+
+---
+
 # LLAMA.CPP DART
 
 A high-performance Dart binding for llama.cpp, enabling advanced text generation capabilities in both Dart and Flutter applications with flexible integration options.
@@ -79,8 +84,9 @@ void main() async {
 ### Prerequisites
 - Dart SDK (for console applications)
 - Flutter SDK (for Flutter applications)
-- Compiled llama.cpp shared library
+- ~Compiled llama.cpp shared library~
 
+<!--
 ### Building llama.cpp Library
 
 1. Clone the llama.cpp repository:
@@ -94,13 +100,17 @@ git clone https://github.com/ggerganov/llama.cpp
 - macOS: Outputs .dylib
 
 3. Place the compiled library in your project's accessible directory
+-->
 
 ## Installation
 
 Add to your `pubspec.yaml`:
 ```yaml
 dependencies:
-  llama_cpp_dart: ^latest_version
+  llama_cpp_dart:
+    git:
+      url: https://github.com/rekire/llama_cpp_dart_fork.git
+      ref: playground
 ```
 
 ## License
