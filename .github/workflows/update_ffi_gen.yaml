@@ -33,7 +33,7 @@ jobs:
           cd llama.cpp
           RELEASE=`git describe --tags --abbrev=0`
           git checkout $RELEASE
-          echo -e "preamble: |\n  // Based on $RELEASE" >> ../.github/ffigen.yaml
+          echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $RELEASE\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run `cd llama.cpp & dart run ffigen --config ../../.github/ffigen.yaml`" >> ../.github/ffigen.yaml
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: run ffigen
@@ -44,7 +44,7 @@ jobs:
         run: |
           dart run ffigen --config ../../.github/ffigen.yaml
           cd ../..
-          git reset --hard .github/ffigen.yaml
+          git reset .github/ffigen.yaml
           if [[ -z "$(git status --porcelain)" ]]; then
             echo 'No changes detected.'
             echo 'diff=FALSE' >> "$GITHUB_OUTPUT"
