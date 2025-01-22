@@ -58,4 +58,5 @@ jobs:
           version: ${{ steps.llama.outputs.version }}
         run: |
           echo "TODO: Automate release of $version"
-          git diff
+          git status
+          head -n 50 lib/src/llama_cpp.dart
