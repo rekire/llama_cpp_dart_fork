@@ -66,9 +66,9 @@ jobs:
           version: ${{ steps.llama.outputs.version }}
         run: |
           if git ls-remote --heads origin | grep -q "rollout/$version"; then
-            echo "pending=FALSE" >> "$GITHUB_OUTPUT"
-          else
             echo "pending=TRUE" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=FALSE" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install LLVM and Clang
