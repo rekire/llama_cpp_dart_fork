@@ -32,6 +32,7 @@ jobs:
           sudo apt-get install build-essential libcurl4-openssl-dev
           mkdir build
           cd build
+          git checkout b4138
           cmake .. \
             -DLLAMA_FATAL_WARNINGS=ON \
             -DLLAMA_CURL=ON \
@@ -80,6 +81,7 @@ jobs:
           version: ${{ steps.llama.outputs.version }}
         run: |
           echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $version\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run:\n  // dart run ffigen --config .github/ffigen.yaml" >> ../.github/ffigen.yaml
+          git checkout $version
           dart run ffigen --config .github/ffigen.yaml
           git reset .github/ffigen.yaml
           if [[ -z "$(git status --porcelain)" ]]; then
