@@ -24,12 +24,25 @@ jobs:
           git checkout $RELEASE
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
+      # The build b4138 does not contain the so files later this can be skipped and the output just been downloaded.
+      - name: Build llama for the unit test
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential libcurl4-openssl-dev
+          mkdir build
+          cd build
+          cmake .. \
+            -DLLAMA_FATAL_WARNINGS=ON \
+            -DLLAMA_CURL=ON \
+            -DGGML_RPC=ON
+          cmake --build . --config Release -j $(nproc)
+
       - name: prepare test
         run: |
           wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
-          wget -nv https://github.com/ggerganov/llama.cpp/releases/download/b4138/llama-b4138-bin-ubuntu-x64.zip
-          unzip llama-b4138-bin-ubuntu-x64.zip
-          rm llama-b4138-bin-ubuntu-x64.zip
+          #wget -nv https://github.com/ggerganov/llama.cpp/releases/download/b4138/llama-b4138-bin-ubuntu-x64.zip
+          #unzip llama-b4138-bin-ubuntu-x64.zip
+          #rm llama-b4138-bin-ubuntu-x64.zip
           ls -la build/bin/
           mv build/bin/*.so .
 
