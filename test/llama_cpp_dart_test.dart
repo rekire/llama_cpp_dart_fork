@@ -19,7 +19,7 @@ void main() {
       answer += token;
       if (done) break;
     }
-    stdout.write('Answer: $answer\n');
+    print('Joke: $answer');
 
     llama.dispose();
   });
