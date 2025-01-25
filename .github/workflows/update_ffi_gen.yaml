@@ -36,17 +36,21 @@ jobs:
           cmake .. \
             -DLLAMA_FATAL_WARNINGS=ON \
             -DLLAMA_CURL=ON \
-            -DGGML_RPC=ON
+            -DGGML_RPC=ON \
+            -DBUILD_SHARED_LIBS=ON \
+            -DLLAMA_NATIVE=ON \
+            -DLLAMA_METAL=ON
           cmake --build . --config Release -j $(nproc)
+          cp src/libllama.so ../..
 
-      - name: prepare test
+      - name: Download test dependencies
         run: |
           wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
-          #wget -nv https://github.com/ggerganov/llama.cpp/releases/download/b4138/llama-b4138-bin-ubuntu-x64.zip
-          #unzip llama-b4138-bin-ubuntu-x64.zip
-          #rm llama-b4138-bin-ubuntu-x64.zip
-          ls -la llama.cpp/build/bin/
-          mv llama.cpp/build/bin/*.so .
+          #wget -nv https://github.com/ggerganov/llama.cpp/releases/download/$version/llama-$version-bin-ubuntu-x64.zip
+          #unzip llama-$version-bin-ubuntu-x64.zip
+          #rm llama-$version-bin-ubuntu-x64.zip
+          #ls -la llama.cpp/build/bin/
+          #mv llama.cpp/build/bin/*.so .
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
