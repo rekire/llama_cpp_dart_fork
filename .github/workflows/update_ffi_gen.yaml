@@ -38,12 +38,10 @@ jobs:
 
       - name: run ffigen
         id: ffigen
-        working-directory: 'llama.cpp/include'
         env:
           version: ${{ steps.llama.outputs.version }}
         run: |
-          dart run ffigen --config ../../.github/ffigen.yaml
-          cd ../..
+          dart run ffigen --config .github/ffigen.yaml
           git reset .github/ffigen.yaml
           if [[ -z "$(git status --porcelain)" ]]; then
             echo 'No changes detected.'
