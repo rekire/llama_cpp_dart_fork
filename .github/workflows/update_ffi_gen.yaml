@@ -19,7 +19,6 @@ jobs:
           cd llama.cpp
           RELEASE=`git describe --tags --abbrev=0`
           git checkout $RELEASE
-          echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $RELEASE\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run:\n  // dart run ffigen --config .github/ffigen.yaml" >> ../.github/ffigen.yaml
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Check for pending rollouts...
@@ -56,6 +55,7 @@ jobs:
         env:
           version: ${{ steps.llama.outputs.version }}
         run: |
+          echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $version\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run:\n  // dart run ffigen --config .github/ffigen.yaml" >> ../.github/ffigen.yaml
           dart run ffigen --config .github/ffigen.yaml
           git reset .github/ffigen.yaml
           if [[ -z "$(git status --porcelain)" ]]; then
