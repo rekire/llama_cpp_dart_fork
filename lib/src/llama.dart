@@ -42,7 +42,12 @@ class Llama {
   bool _isDisposed = false;
   LlamaStatus _status = LlamaStatus.uninitialized;
 
-  static String? libraryPath = Platform.isAndroid ? "libllama.so" : null;
+  static String? libraryPath = switch(Platform.operatingSystem) {
+    'android' || 'linux' => 'libllama.so',
+    'windows' => 'llama.dll',
+    'ios' || 'macos' => 'libllama.dylib',
+    _ => null
+  };
 
   /// Gets the current status of the Llama instance
   LlamaStatus get status => _status;
