@@ -5,6 +5,10 @@ import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 
 void main() {
   test('Smoke-Test', () {
+    final found = Llama.libraryPath != null && File(Llama.libraryPath!).existsSync();
+    print('Using libraryPath: ${Llama.libraryPath} found: $found');
+    print('Current path: ${Directory.current.path}');
+
     String modelPath = 'Oolel-Small-v0.1.Q4_K_S.gguf';
     Llama llama = Llama(modelPath);
 
