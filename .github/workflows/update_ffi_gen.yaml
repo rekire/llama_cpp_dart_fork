@@ -12,6 +12,9 @@ jobs:
     name: Linux
     runs-on: ubuntu-22.04
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
       - name: Checkout latest llama.cpp release
         id: llama
         run: |
@@ -44,10 +47,6 @@ jobs:
         with:
           channel: stable
           flutter-version: 3.27.2
-
-      - name: Clone repository
-        if: ${{ steps.release.outputs.pending == 'FALSE' }}
-        uses: actions/checkout@v4
 
       - name: run ffigen
         if: ${{ steps.release.outputs.pending == 'FALSE' }}
