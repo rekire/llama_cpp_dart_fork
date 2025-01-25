@@ -47,6 +47,12 @@ jobs:
           ls -la llama.cpp/build/bin/
           mv llama.cpp/build/bin/*.so .
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.2
+
       - name: run tests
         run: flutter test
 
@@ -66,13 +72,6 @@ jobs:
         uses: KyleMayes/install-llvm-action@v2
         with:
           version: "10.0"
-
-      - name: Set up Flutter
-        if: ${{ steps.release.outputs.pending == 'FALSE' }}
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.27.2
 
       - name: run ffigen
         if: ${{ steps.release.outputs.pending == 'FALSE' }}
