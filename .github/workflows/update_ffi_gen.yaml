@@ -12,20 +12,6 @@ jobs:
     name: Linux
     runs-on: ubuntu-22.04
     steps:
-      - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v2
-        with:
-          version: "10.0"
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.27.2
-
-      - name: Clone repository
-        uses: actions/checkout@v4
-
       - name: Checkout latest llama.cpp release
         id: llama
         run: |
@@ -36,7 +22,36 @@ jobs:
           echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $RELEASE\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run:\n  // dart run ffigen --config .github/ffigen.yaml" >> ../.github/ffigen.yaml
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
 
+      - name: Check for pending rollouts...
+        id: release
+        env:
+          version: ${{ steps.llama.outputs.version }}
+        run: |
+          if git ls-remote --heads origin "rollout/$version"; then
+            echo "pending=TRUE" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=FALSE" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install LLVM and Clang
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "10.0"
+
+      - name: Set up Flutter
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.2
+
+      - name: Clone repository
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
+        uses: actions/checkout@v4
+
       - name: run ffigen
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
         id: ffigen
         env:
           version: ${{ steps.llama.outputs.version }}
