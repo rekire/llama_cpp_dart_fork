@@ -40,7 +40,6 @@ jobs:
             -DBUILD_SHARED_LIBS=ON \
             -DLLAMA_NATIVE=ON
           cmake --build . --config Release -j $(nproc)
-          ls -la src
           cp src/libllama.so ../..
 
       - name: Download test dependencies
@@ -66,10 +65,10 @@ jobs:
         env:
           version: ${{ steps.llama.outputs.version }}
         run: |
-          if git ls-remote --heads origin "rollout/$version"; then
-            echo "pending=TRUE" >> "$GITHUB_OUTPUT"
-          else
+          if git ls-remote --heads origin | grep -q "rollout/$version"; then
             echo "pending=FALSE" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=TRUE" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install LLVM and Clang
