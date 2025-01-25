@@ -54,7 +54,7 @@ jobs:
           flutter-version: 3.27.2
 
       - name: run tests
-        run: PATH="$PATH:llama.cpp/build/bin" flutter test
+        run: LD_LIBRARY_PATH="$LD_LIBRARY_PATH:llama.cpp/build/bin" flutter test
 
       - name: Check for pending rollouts...
         id: release
