@@ -38,9 +38,9 @@ jobs:
             -DLLAMA_CURL=ON \
             -DGGML_RPC=ON \
             -DBUILD_SHARED_LIBS=ON \
-            -DLLAMA_NATIVE=ON \
-            -DLLAMA_METAL=ON
+            -DLLAMA_NATIVE=ON
           cmake --build . --config Release -j $(nproc)
+          ls -la src
           cp src/libllama.so ../..
 
       - name: Download test dependencies
