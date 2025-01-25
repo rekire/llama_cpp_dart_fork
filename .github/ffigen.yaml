@@ -4,6 +4,8 @@ output: '../lib/src/llama_cpp.dart'
 # ignore-source-errors: true
 headers:
   entry-points:
-    - 'llama.h'
+    - '../llama.cpp/include/llama.h'
 compiler-opts:
   - '-I/usr/lib/clang/17/include'
+  - '-I./llama.cpp/include/'
+  - '-I./llama.cpp/ggml/include/'
