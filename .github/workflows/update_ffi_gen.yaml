@@ -26,9 +26,11 @@ jobs:
 
       - name: prepare test
         run: |
-          wget https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
-          wget https://github.com/ggerganov/llama.cpp/releases/download/b4138/llama-b4138-bin-ubuntu-x64.zip
+          wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
+          wget -nv https://github.com/ggerganov/llama.cpp/releases/download/b4138/llama-b4138-bin-ubuntu-x64.zip
           unzip llama-b4138-bin-ubuntu-x64.zip
+          rm llama-b4138-bin-ubuntu-x64.zip
+          ls -la build/bin/
           mv build/bin/*.so .
 
       - name: run tests
