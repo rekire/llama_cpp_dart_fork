@@ -116,7 +116,9 @@ jobs:
           echo b
           git stash save "Rollout $version"
           echo c
-          git checkout -b "rollout/$version" upsteam main
+          git fetch upstream main
+          echo c2
+          git checkout -b "rollout/$version"
           echo d
           git stash pop
           echo e
