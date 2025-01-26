@@ -84,7 +84,9 @@ jobs:
           version: ${{ steps.llama.outputs.version }}
         run: |
           echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $version\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run:\n  // dart run ffigen --config .github/ffigen.yaml" >> .github/ffigen.yaml
+          cd llama.cpp
           git checkout $version
+          cd ..
           dart run ffigen --config .github/ffigen.yaml
           git reset .github/ffigen.yaml
           if [[ -z "$(git status --porcelain)" ]]; then
