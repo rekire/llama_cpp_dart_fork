@@ -96,6 +96,14 @@ jobs:
             echo 'diff=TRUE' >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Fetch upsteam
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
+        run: |
+          echo "Adding remote: https://github.com/netdur/llama_cpp_dart.git"
+          git remote add upstream https://github.com/netdur/llama_cpp_dart.git
+          echo "Fetching from upstream..."
+          git fetch upstream
+
       - name: Rollout changes
         if: ${{ steps.ffigen.outputs.diff == 'TRUE' }}
         env:
@@ -104,8 +112,6 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add lib/src/llama_cpp.dart
-          git remote add upstream https://github.com/netdur/llama_cpp_dart.git
-          git fetch upsteam main
-          git checkout -b "rollout/$version"
+          git checkout -b "rollout/$version" upsteam main
           git commit -m "Rollout changes of llama release $version"
           git push origin "rollout/$version"
