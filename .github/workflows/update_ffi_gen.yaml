@@ -121,6 +121,8 @@ jobs:
           git checkout -b "rollout/$version"
           echo d
           git stash pop
+          echo d2
+          git add lib/src/llama_cpp.dart
           echo e
           git commit -m "Rollout changes of llama release $version"
           echo f
