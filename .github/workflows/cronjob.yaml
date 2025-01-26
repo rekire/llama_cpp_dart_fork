@@ -1,15 +1,13 @@
-name: FFI Playground
+name: Update Cronjob
 
 on:
-  push:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  schedule:
+    - cron: '0 */6 * * *'
 
 jobs:
   linux:
     name: Linux
+    timeout-minutes: 5
     runs-on: ubuntu-22.04
     steps:
       - name: Clone repository
@@ -23,42 +21,6 @@ jobs:
           RELEASE=`git describe --tags --abbrev=0`
           git checkout $RELEASE
           echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
-
-      # The build b4138 does not contain the so files later this can be skipped and the output just been downloaded.
-      - name: Build llama for the unit test
-        working-directory: llama.cpp
-        run: |
-          sudo apt-get update
-          sudo apt-get install build-essential libcurl4-openssl-dev
-          mkdir build
-          cd build
-          git checkout b4138
-          cmake .. \
-            -DLLAMA_FATAL_WARNINGS=ON \
-            -DLLAMA_CURL=ON \
-            -DGGML_RPC=ON \
-            -DBUILD_SHARED_LIBS=ON \
-            -DLLAMA_NATIVE=ON
-          cmake --build . --config Release -j $(nproc)
-          cp src/libllama.so ../..
-
-      - name: Download test dependencies
-        run: |
-          wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
-          #wget -nv https://github.com/ggerganov/llama.cpp/releases/download/$version/llama-$version-bin-ubuntu-x64.zip
-          #unzip llama-$version-bin-ubuntu-x64.zip
-          #rm llama-$version-bin-ubuntu-x64.zip
-          #ls -la llama.cpp/build/bin/
-          #mv llama.cpp/build/bin/*.so .
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.27.2
-
-      - name: run tests
-        run: LD_LIBRARY_PATH="$LD_LIBRARY_PATH:llama.cpp/build/bin" flutter test
 
       - name: Check for pending rollouts...
         id: release

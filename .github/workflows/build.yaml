@@ -1,0 +1,50 @@
+name: Build
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      # The build b4138 does not contain the so files later this can be skipped and the output just been downloaded.
+      - name: Build llama.cpp
+        run: |
+          git clone https://github.com/ggerganov/llama.cpp.git
+          git checkout b4138
+          sudo apt-get update
+          sudo apt-get install build-essential libcurl4-openssl-dev
+          mkdir llama.cpp/build
+          cd llama.cpp/build
+          cmake .. \
+            -DLLAMA_FATAL_WARNINGS=ON \
+            -DLLAMA_CURL=ON \
+            -DGGML_RPC=ON \
+            -DBUILD_SHARED_LIBS=ON \
+            -DLLAMA_NATIVE=ON
+          cmake --build . --config Release -j $(nproc)
+          cp src/libllama.so ../..
+
+      - name: Download test dependencies
+        run: |
+          wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
+          #wget -nv https://github.com/ggerganov/llama.cpp/releases/download/$version/llama-$version-bin-ubuntu-x64.zip
+          #unzip llama-$version-bin-ubuntu-x64.zip
+          #rm llama-$version-bin-ubuntu-x64.zip
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.2
+
+      - name: Run tests
+        run: LD_LIBRARY_PATH="$LD_LIBRARY_PATH:llama.cpp/build/bin" flutter test
