@@ -19,11 +19,11 @@ jobs:
       - name: Build llama.cpp
         run: |
           git clone https://github.com/ggerganov/llama.cpp.git
-          git checkout b4138
           sudo apt-get update
           sudo apt-get install build-essential libcurl4-openssl-dev
           mkdir llama.cpp/build
           cd llama.cpp/build
+          git checkout b4138
           cmake .. \
             -DLLAMA_FATAL_WARNINGS=ON \
             -DLLAMA_CURL=ON \
