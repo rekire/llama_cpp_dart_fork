@@ -7,7 +7,7 @@ on:
 jobs:
   linux:
     name: Linux
-    timeout-minutes: 5
+    timeout-minutes: 8
     runs-on: ubuntu-22.04
     steps:
       - name: Clone repository
