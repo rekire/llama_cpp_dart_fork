@@ -6,7 +6,7 @@ on:
 
 jobs:
   linux:
-    name: Linux
+    name: Update Cronjob
     timeout-minutes: 8
     runs-on: ubuntu-22.04
     steps:
