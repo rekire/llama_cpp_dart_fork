@@ -1,0 +1,78 @@
+name: Update Cronjob
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+
+jobs:
+  linux:
+    name: Linux
+    timeout-minutes: 8
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Checkout latest llama.cpp release
+        id: llama
+        run: |
+          git clone https://github.com/ggerganov/llama.cpp.git
+          cd llama.cpp
+          RELEASE=`git describe --tags --abbrev=0`
+          git checkout $RELEASE
+          echo "version=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Check for pending rollouts...
+        id: release
+        env:
+          version: ${{ steps.llama.outputs.version }}
+        run: |
+          if git ls-remote --heads origin | grep -q "rollout/$version"; then
+            echo "pending=TRUE" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=FALSE" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install LLVM and Clang
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "10.0"
+
+      - name: run ffigen
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
+        id: ffigen
+        env:
+          version: ${{ steps.llama.outputs.version }}
+        run: |
+          echo -e "preamble: |\n  // AUTO GENERATED FILE by CI for release $version\n  // In order to run this locally checkout llama.cpp in this repository's root folder and run:\n  // dart run ffigen --config .github/ffigen.yaml" >> .github/ffigen.yaml
+          cd llama.cpp
+          git checkout $version
+          cd ..
+          dart run ffigen --config .github/ffigen.yaml
+          git reset .github/ffigen.yaml
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo 'No changes detected.'
+            echo 'diff=FALSE' >> "$GITHUB_OUTPUT"
+          else
+            echo 'diff=TRUE' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rollout changes
+        if: ${{ steps.ffigen.outputs.diff == 'TRUE' }}
+        env:
+          version: ${{ steps.llama.outputs.version }}
+        run: |
+          git remote add upstream https://github.com/netdur/llama_cpp_dart.git
+          git fetch upstream
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp lib/src/llama_cpp.dart /tmp
+          git reset --hard
+          git checkout upstream/main
+          git checkout -b "rollout/$version"
+          rm lib/src/llama_cpp.dart
+          mv /tmp/llama_cpp.dart lib/src/llama_cpp.dart
+          git add lib/src/llama_cpp.dart
+          git commit -m "Rollout changes of llama release $version"
+          git push origin "rollout/$version"
