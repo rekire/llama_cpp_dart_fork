@@ -39,6 +39,12 @@ jobs:
         with:
           version: "10.0"
 
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.2
+
       - name: run ffigen
         if: ${{ steps.release.outputs.pending == 'FALSE' }}
         id: ffigen
