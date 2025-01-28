@@ -2,12 +2,12 @@ name: Update Cronjob
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */3 * * *'
 
 jobs:
   linux:
     name: Update Cronjob
-    timeout-minutes: 8
+    timeout-minutes: 5
     runs-on: ubuntu-22.04
     steps:
       - name: Clone repository
@@ -40,6 +40,7 @@ jobs:
           version: "10.0"
 
       - name: Install Flutter
+        if: ${{ steps.release.outputs.pending == 'FALSE' }}
         uses: subosito/flutter-action@v2
         with:
           channel: stable
