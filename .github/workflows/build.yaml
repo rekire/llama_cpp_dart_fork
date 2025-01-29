@@ -15,30 +15,14 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      # The build b4138 does not contain the so files later this can be skipped and the output just been downloaded.
-      - name: Build llama.cpp
-        run: |
-          git clone https://github.com/ggerganov/llama.cpp.git
-          sudo apt-get update
-          sudo apt-get install build-essential libcurl4-openssl-dev
-          mkdir llama.cpp/build
-          cd llama.cpp/build
-          git checkout b4138
-          cmake .. \
-            -DLLAMA_FATAL_WARNINGS=ON \
-            -DLLAMA_CURL=ON \
-            -DGGML_RPC=ON \
-            -DBUILD_SHARED_LIBS=ON \
-            -DLLAMA_NATIVE=ON
-          cmake --build . --config Release -j $(nproc)
-          cp src/libllama.so ../..
-
       - name: Download test dependencies
+        env:
+          version: b4586
         run: |
           wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
-          #wget -nv https://github.com/ggerganov/llama.cpp/releases/download/$version/llama-$version-bin-ubuntu-x64.zip
-          #unzip llama-$version-bin-ubuntu-x64.zip
-          #rm llama-$version-bin-ubuntu-x64.zip
+          wget -nv https://github.com/ggerganov/llama.cpp/releases/download/$version/llama-$version-bin-ubuntu-x64.zip
+          unzip llama-$version-bin-ubuntu-x64.zip
+          rm llama-$version-bin-ubuntu-x64.zip
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2

@@ -28,6 +28,7 @@ enum LlamaStatus { uninitialized, ready, generating, error, disposed }
 class Llama {
   static llama_cpp? _lib;
   Pointer<llama_model>? model;
+  Pointer<llama_vocab>? vocab;
   Pointer<llama_context>? context;
   llama_batch? batch;
 
@@ -107,19 +108,21 @@ class Llama {
     final modelPathPtr = modelPath.toNativeUtf8().cast<Char>();
     try {
       model = lib.llama_load_model_from_file(modelPathPtr, modelParams);
-      if (model!.address == 0) {
+      if (model == null || model!.address == 0) {
         throw LlamaException("Could not load model at $modelPath");
       }
     } finally {
       malloc.free(modelPathPtr);
     }
 
+    vocab = lib.llama_model_get_vocab(model!);
+
     contextParamsDart ??= ContextParams();
     _nPredict = contextParamsDart.nPredit;
     var contextParams = contextParamsDart.get();
 
     context = lib.llama_new_context_with_model(model!, contextParams);
-    if (context!.address == 0) {
+    if (context == null || context!.address == 0) {
       throw Exception("Could not load context!");
     }
 
@@ -170,7 +173,7 @@ class Llama {
     lib.llama_sampler_chain_add(
         _smpl,
         lib.llama_sampler_init_mirostat(
-            lib.llama_n_vocab(model!),
+            lib.llama_vocab_n_tokens(vocab!),
             samplerParams.seed,
             samplerParams.mirostatTau,
             samplerParams.mirostatEta,
@@ -185,10 +188,11 @@ class Llama {
     final grammarRootPtr =
         samplerParams.grammarRoot.toNativeUtf8().cast<Char>();
     lib.llama_sampler_chain_add(_smpl,
-        lib.llama_sampler_init_grammar(model!, grammarStrPtr, grammarRootPtr));
+        lib.llama_sampler_init_grammar(vocab!, grammarStrPtr, grammarRootPtr));
     calloc.free(grammarStrPtr);
     calloc.free(grammarRootPtr);
 
+/* FIXME
     lib.llama_sampler_chain_add(
         _smpl,
         lib.llama_sampler_init_penalties(
@@ -201,7 +205,7 @@ class Llama {
             samplerParams.penaltyPresent,
             samplerParams.penaltyNewline,
             samplerParams.ignoreEOS));
-
+*/
     // Add DRY sampler
     final seqBreakers = samplerParams.dryBreakers;
     final numBreakers = seqBreakers.length;
@@ -211,17 +215,18 @@ class Llama {
       for (var i = 0; i < numBreakers; i++) {
         seqBreakersPointer[i] = seqBreakers[i].toNativeUtf8().cast<Char>();
       }
-
+/* FIXME
       lib.llama_sampler_chain_add(
           _smpl,
           lib.llama_sampler_init_dry(
-              model!,
+              vocab!,
               samplerParams.dryPenalty,
               samplerParams.dryMultiplier,
               samplerParams.dryAllowedLen,
               samplerParams.dryLookback,
               seqBreakersPointer,
               numBreakers));
+ */
     } finally {
       // Clean up DRY sampler allocations
       for (var i = 0; i < numBreakers; i++) {
@@ -262,10 +267,10 @@ class Llama {
       final promptPtr = prompt.toNativeUtf8().cast<Char>();
       try {
         _nPrompt = -lib.llama_tokenize(
-            model!, promptPtr, prompt.length, nullptr, 0, true, true);
+            vocab!, promptPtr, prompt.length, nullptr, 0, true, true);
 
         _tokens = malloc<llama_token>(_nPrompt);
-        if (lib.llama_tokenize(model!, promptPtr, prompt.length, _tokens,
+        if (lib.llama_tokenize(vocab!, promptPtr, prompt.length, _tokens,
                 _nPrompt, true, true) <
             0) {
           throw LlamaException("Failed to tokenize prompt");
@@ -304,13 +309,13 @@ class Llama {
 
       int newTokenId = lib.llama_sampler_sample(_smpl, context!, -1);
 
-      if (lib.llama_token_is_eog(model!, newTokenId)) {
+      if (lib.llama_token_is_eog(vocab!, newTokenId)) {
         return ("", true);
       }
 
       final buf = malloc<Char>(128);
       try {
-        int n = lib.llama_token_to_piece(model!, newTokenId, buf, 128, 0, true);
+        int n = lib.llama_token_to_piece(vocab!, newTokenId, buf, 128, 0, true);
         if (n < 0) {
           throw LlamaException("Failed to convert token to piece");
         }
@@ -320,7 +325,7 @@ class Llama {
         _tokenPtr.value = newTokenId;
         batch = lib.llama_batch_get_one(_tokenPtr, 1);
 
-        bool isEos = newTokenId == lib.llama_token_eos(model!);
+        bool isEos = newTokenId == lib.llama_token_eos(vocab!);
         return (piece, isEos);
       } finally {
         malloc.free(buf);
@@ -356,8 +361,9 @@ class Llama {
     if (_tokens != nullptr) malloc.free(_tokens);
     if (_tokenPtr != nullptr) malloc.free(_tokenPtr);
     if (_smpl != nullptr) lib.llama_sampler_free(_smpl);
-    if (context != null && context?.address != 0) lib.llama_free(context!);
-    if (model != null && model?.address != 0) lib.llama_free_model(model!);
+    if (context != null && context!.address != 0) lib.llama_free(context!);
+    if (model != null && model!.address != 0) lib.llama_free_model(model!);
+    //if (vocab != null && vocab!.address != 0) lib.llama_free(vocab!);
 
     lib.llama_backend_free();
 
@@ -385,7 +391,7 @@ class Llama {
       _nPos = 0;
 
       // Reset the context state
-      if (context?.address != 0) {
+      if (context != null && context!.address != 0) {
         lib.llama_kv_cache_clear(context!);
       }
 
@@ -423,7 +429,7 @@ class Llama {
       try {
         // First get the required number of tokens
         int nTokens = -lib.llama_tokenize(
-            model!, textPtr, text.length, nullptr, 0, addBos, true);
+            vocab!, textPtr, text.length, nullptr, 0, addBos, true);
 
         if (nTokens <= 0) {
           throw LlamaException('Failed to determine token count');
@@ -435,7 +441,7 @@ class Llama {
         try {
           // Perform actual tokenization
           int actualTokens = lib.llama_tokenize(
-              model!, textPtr, text.length, tokens, nTokens, addBos, true);
+              vocab!, textPtr, text.length, tokens, nTokens, addBos, true);
 
           if (actualTokens < 0) {
             throw LlamaException('Tokenization failed');

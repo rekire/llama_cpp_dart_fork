@@ -75,7 +75,7 @@ class ModelParams {
     // Handle rpc_servers
     if (rpcServers.isNotEmpty) {
       _rpcServersPtr = rpcServers.toNativeUtf8().cast<Char>();
-      modelParams.rpc_servers = _rpcServersPtr!;
+      //FIXME: modelParams.rpc_servers = _rpcServersPtr!;
     }
 
     // Complex pointers set to null
