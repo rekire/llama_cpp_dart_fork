@@ -16,9 +16,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download test dependencies
-        env:
-          version: b4586
         run: |
+          version=`grep version pubspec.yaml | cut -d - -f 3`
           wget -nv https://huggingface.co/mradermacher/Oolel-Small-v0.1-GGUF/resolve/main/Oolel-Small-v0.1.Q4_K_S.gguf
           wget -nv https://github.com/ggerganov/llama.cpp/releases/download/$version/llama-$version-bin-ubuntu-x64.zip
           unzip llama-$version-bin-ubuntu-x64.zip

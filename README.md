@@ -84,7 +84,10 @@ void main() async {
 ### Prerequisites
 - Dart SDK (for console applications)
 - Flutter SDK (for Flutter applications)
-- ~Compiled llama.cpp shared library~
+- Download the binaries from https://github.com/ggerganov/llama.cpp/releases ensure that you
+  download that one of the library version e.g. b4586 (check the version number)
+- Make the dll file part of your path (e.g. in the directory of the exe) or LD_LIBRARY_PATH for
+  Linux and macOS (iOS and Android are not tested for this fork)
 
 <!--
 ### Building llama.cpp Library
