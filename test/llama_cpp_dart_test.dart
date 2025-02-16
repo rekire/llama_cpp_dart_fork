@@ -12,7 +12,10 @@ void main() {
     String modelPath = 'Oolel-Small-v0.1.Q4_K_S.gguf';
     Llama llama = Llama(modelPath);
 
-    llama.setPrompt('Tell me a joke');
+    llama.setPrompt('''<|im_start|>user 
+        Tell me a joke
+        <|im_end|>
+        <|im_start|>assistant''');
     var answer = '';
     while (true) {
       var (token, done) = llama.getNext();
